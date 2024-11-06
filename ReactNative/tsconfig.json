@@ -4,15 +4,18 @@
     "strict": true,
     "jsx": "react",
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@/*": ["./*"]
     }
   },
   "include": [
     "**/*.ts",
     "**/*.tsx",
     ".expo/types/**/*.ts",
-    "expo-env.d.ts"
+    "expo-env.d.ts",
+    "app/(tabs)/Profile/index.jsx",
+    "app/(tabs)/Post/index.jsx",
+    "app/(tabs)/Home/index.jsx",
+    "app/(tabs)/Buscador/index.jsx",
+    "app/(tabs)/Notifications/index.jsx"
   ]
 }
