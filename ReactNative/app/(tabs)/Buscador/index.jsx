@@ -1,20 +1,21 @@
 import React, { useEffect, useState } from "react";
 import {
+  ScrollView,
   Image,
   StyleSheet,
-  FlatList,
   Text,
   View,
   ActivityIndicator,
+  TextInput,
 } from "react-native";
 import { HelloWave } from "@/components/HelloWave";
-import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 
 export default function HomeScreen() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const getAllUsers = async () => {
@@ -37,22 +38,27 @@ export default function HomeScreen() {
     getAllUsers();
   }, []);
 
+  const filteredUsers = users.filter((user) =>
+    user.username.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
-    <>
-      <ParallaxScrollView
-        headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }}
-        headerImage={
-          <Image
-            source={require("@/assets/images/partial-react-logo.png")}
-            style={styles.reactLogo}
-          />
-        }
-      >
+    <ScrollView style={styles.container}>
+      <View style={styles.header}>
         <ThemedView style={styles.titleContainer}>
-          <ThemedText type="title">Buscador</ThemedText>
-          <HelloWave />
+          <ThemedText style={styles.titleText} type="title">
+            Buscador
+          </ThemedText>
         </ThemedView>
-      </ParallaxScrollView>
+      </View>
+
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Buscar por nombre"
+        placeholderTextColor="#888"
+        value={searchTerm}
+        onChangeText={setSearchTerm}
+      />
 
       {loading ? (
         <ActivityIndicator
@@ -61,33 +67,50 @@ export default function HomeScreen() {
           style={styles.loading}
         />
       ) : (
-        <FlatList
-          data={users}
-          keyExtractor={(item) => item._id}
-          renderItem={({ item }) => (
-            <View style={styles.userContainer}>
-              <Text style={styles.userName}>{item.username}</Text>
-              <Text style={styles.userEmail}>{item.email}</Text>
-            </View>
-          )}
-        />
+        filteredUsers.map((user) => (
+          <View key={user._id} style={styles.userContainer}>
+            <Text style={styles.userName}>{user.username}</Text>
+          </View>
+        ))
       )}
-    </>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: "row",
+  titleText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "black",
+  },
+  container: {
+    flex: 1,
+    backgroundColor: "#f9f9f9",
+  },
+  header: {
     alignItems: "center",
-    gap: 8,
+    backgroundColor: "white",
+    paddingVertical: 20,
   },
   reactLogo: {
     height: 178,
     width: 290,
-    bottom: 0,
-    left: 0,
-    position: "absolute",
+    marginBottom: 10,
+  },
+  titleContainer: {
+    backgroundColor: "white",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  searchInput: {
+    padding: 8,
+    margin: 10,
+    borderColor: "#ccc",
+    borderWidth: 1,
+    borderRadius: 8,
+    color: "#000",
+    backgroundColor: "#fff",
   },
   userContainer: {
     padding: 10,
