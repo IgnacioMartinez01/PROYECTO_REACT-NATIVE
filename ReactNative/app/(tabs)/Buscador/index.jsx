@@ -7,15 +7,17 @@ import {
   View,
   ActivityIndicator,
   TextInput,
+  TouchableOpacity,
 } from "react-native";
-import { HelloWave } from "@/components/HelloWave";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
+import { useNavigation } from "@react-navigation/native";
 
 export default function HomeScreen() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const navigation = useNavigation(); // Hook for navigation
 
   useEffect(() => {
     const getAllUsers = async () => {
@@ -41,6 +43,10 @@ export default function HomeScreen() {
   const filteredUsers = users.filter((user) =>
     user.username.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleUserPress = (userId) => {
+    navigation.navigate("Profile", { userId }); // Navigate to Profile screen with userId
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -68,9 +74,23 @@ export default function HomeScreen() {
         />
       ) : (
         filteredUsers.map((user) => (
-          <View key={user._id} style={styles.userContainer}>
-            <Text style={styles.userName}>{user.username}</Text>
-          </View>
+          <TouchableOpacity
+            key={user._id}
+            onPress={() => handleUserPress(user._id)}
+          >
+            <View style={styles.userContainer}>
+              <Image
+                source={{
+                  uri: user.profilePicture || "https://via.placeholder.com/50",
+                }}
+                style={styles.profileImage}
+              />
+              <View style={styles.userInfo}>
+                <Text style={styles.userName}>{user.username}</Text>
+                <Text style={styles.userEmail}>{user.email}</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
         ))
       )}
     </ScrollView>
