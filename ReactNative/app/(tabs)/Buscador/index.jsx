@@ -12,12 +12,12 @@ import {
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { useNavigation } from "@react-navigation/native";
+import { router } from "expo-router";
 
 export default function HomeScreen() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const navigation = useNavigation(); // Hook for navigation
 
   useEffect(() => {
     const getAllUsers = async () => {
@@ -45,7 +45,7 @@ export default function HomeScreen() {
   );
 
   const handleUserPress = (userId) => {
-    navigation.navigate("Profile", { userId }); // Navigate to Profile screen with userId
+    router.navigate("Profile", { userId }); // Navigate to Profile screen with userId
   };
 
   return (
