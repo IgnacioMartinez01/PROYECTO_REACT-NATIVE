@@ -72,17 +72,16 @@ export default function HomeScreen() {
   useEffect(() => {
     const getFeed = async () => {
       try {
-        const response = await fetch("http://10.13.22.51:3001/api/posts/feed", {
+        const response = await fetch("http://10.13.16.52:3001/api/posts/feed", {
           headers: {
-            Authorization: `Bearer `,
+            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3MzI4MjBiZDFjMDRiYjJhMTAyZjYzNyIsImlhdCI6MTczMTM2MzQxNiwiZXhwIjoxNzMzOTU1NDE2fQ.qX6q94MieuxsMe2kyjVJQIgshhEJLFnuslav4m1b_H8`,
             "Content-Type": "application/json",
           },
         });
-        console.log(response);
 
         const data = await response.json();
         console.log("Feed fetched:", data);
-        setUsers(data);
+        // setUsers(data);
       } catch (error) {
         console.error("Error fetching users:", error);
       } finally {
