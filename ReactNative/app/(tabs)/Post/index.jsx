@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button, Image, View, Text, TextInput, StyleSheet, SafeAreaView, FlatList } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import { Card } from '@rneui/themed';
 
 export default function ImageGallery() {
   const [description, setDescription] = useState("");
@@ -65,28 +66,32 @@ export default function ImageGallery() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <TextInput
-        placeholder="Descripción de la imagen"
-        value={description}
-        onChangeText={setDescription}
-        style={styles.input}
-      />
-      <Button title="Seleccionar imagen de la galería" onPress={pickImageFromLibrary} />
-      <Button title="Tomar una foto" onPress={takePhoto} />
-      {image && (
-        <View style={styles.imageContainer}>
-          <Image source={{ uri: image }} style={styles.image} />
-          <Text style={styles.description}>{description}</Text>
-        </View>
-      )}
-      <Button title="Publicar" onPress={publishPost} />
+      <Card style={styles.Card}>
+        <Button title="Seleccionar imagen de la galería" onPress={pickImageFromLibrary} />
+        <Button title="Tomar una foto" onPress={takePhoto} />
+        {image && (
+          <View style={styles.imageContainer}>
+            <Image source={{ uri: image }} style={styles.image} />
+            <Text style={styles.description}>{description}</Text>
+          </View>
+        )}
 
-      <FlatList
-        data={posts}
-        keyExtractor={(item) => item.id}
-        renderItem={renderPost}
-        style={styles.postList}
-      />
+          <TextInput
+          placeholder="Descripción de la imagen"
+          value={description}
+          onChangeText={setDescription}
+          style={styles.input}
+        />
+        
+        <Button title="Publicar" onPress={publishPost} />
+
+        <FlatList
+          data={posts}
+          keyExtractor={(item) => item.id}
+          renderItem={renderPost}
+          style={styles.postList}
+        />
+      </Card>
     </SafeAreaView>
   );
 }
@@ -133,4 +138,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
   },
+  
 });
