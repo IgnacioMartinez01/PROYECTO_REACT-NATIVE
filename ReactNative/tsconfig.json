@@ -17,5 +17,5 @@
     "app/(tabs)/Home/index.jsx",
     "app/(tabs)/Buscador/index.jsx",
     "app/(tabs)/Notifications/index.jsx"
-  ]
+, "app/index.jsx"  ]
 }
