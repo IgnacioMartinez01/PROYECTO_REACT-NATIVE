@@ -22,7 +22,7 @@ export default function HomeScreen() {
   useEffect(() => {
     const getAllUsers = async () => {
       try {
-        const response = await fetch("http://10.13.226.154:3000/api/user/all", {
+        const response = await fetch("http://172.20.10.2:3001/api/user/all", {
           headers: {
             Authorization:
               "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3MjAwYTZmNDU2YjA2Y2U3ZWE0NjFiNiIsImlhdCI6MTczMDE1MzIzMywiZXhwIjoxNzMyNzQ1MjMzfQ.w31t6R5D_6EG_PHOxYvsXfn0lQ9Xcsu0pTP-5vpbvk0",

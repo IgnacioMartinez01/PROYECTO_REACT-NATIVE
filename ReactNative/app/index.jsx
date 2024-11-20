@@ -1,52 +1,53 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Redirect, useNavigation } from "expo-router";
 import { useState } from "react";
 import { View, Text, TextInput, Button, TouchableOpacity } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const LoginPage = () => {
-  const navigation=useNavigation();
+  const navigation = useNavigation();
+
   const redirectRegister = () => {
     navigation.navigate("Home");
   };
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  /*
+
+  useEffect(() => {
+    const getToken = async () => {
+      try {
+        const value = await AsyncStorage.getItem("authToken");
+        if (value) {
+          navigation.replace("(tabs)");
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getToken();
+  }, []);
+
   const handleLogin = async () => {
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:3000/api/auth/login", {
+      const response = await fetch("http://172.20.10.2:3001/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
       });
-      */
-
-  const handleLogin = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch("http://localhost:3000/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      })
-
-      console.log(response);
-      
 
       const data = await response.json();
 
       if (response.ok) {
-        const token = data.token; 
+        const token = data.token;
         await AsyncStorage.setItem("authToken", token);
         console.log("Login exitoso:", data);
-        const navigation = useNavigation();
-        navigation.navigate("Home");
+        navigation.replace("(tabs)");
       } else {
         setError(data.message || "Error al iniciar sesión");
       }
@@ -90,6 +91,25 @@ const LoginPage = () => {
       </View>
     </>
   );
+};
+
+const index = () => {
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    const getToken = async () => {
+      try {
+        const value = await AsyncStorage.getItem("authToken");
+        console.log(value);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    getToken();
+  }, []);
+
+  return <LoginPage />;
 };
 export default LoginPage;
 
