@@ -1,75 +1,146 @@
-import { Image, StyleSheet, Platform } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
+import React, { useState, useEffect } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-import { HelloWave } from "@/components/HelloWave";
-import ParallaxScrollView from "@/components/ParallaxScrollView";
-import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
-import React from "react";
+const samplePosts = [
+  {
+    id: "1",
+    user: "johndoe",
+    imageUrl:
+      "https://cdn.pixabay.com/photo/2024/01/17/12/06/car-8514314_640.png",
+    caption: "Look at this cute kitten!",
+    likes: 100,
+  },
+  {
+    id: "2",
+    user: "janedoe",
+    imageUrl:
+      "https://cdn.pixabay.com/photo/2024/01/17/12/06/car-8514314_640.png",
+    caption: "Another adorable cat!",
+    likes: 250,
+  },
+  {
+    id: "3",
+    user: "janedoe2",
+    imageUrl:
+      "https://cdn.pixabay.com/photo/2024/01/17/12/06/car-8514314_640.png",
+    caption: "Another adorable cat!",
+    likes: 252,
+  },
+  // Add more posts here
+];
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }}
-      headerImage={
-        <Image
-          source={require("@/assets/images/partial-react-logo.png")}
-          style={styles.reactLogo}
-        />
+  const [posts, setPosts] = useState(samplePosts);
+
+  // Function to handle like button press
+  const handleLike = (id) => {
+    setPosts((prevPosts) =>
+      prevPosts.map((post) =>
+        post.id === id ? { ...post, likes: post.likes + 1 } : post
+      )
+    );
+  };
+
+  const renderPost = ({ item }) => (
+    <View style={styles.postContainer}>
+      <Text style={styles.userText}>{item.user}</Text>
+
+      <Image source={{ uri: item.imageUrl }} style={styles.image} />
+
+      <View style={styles.actionsContainer}>
+        <TouchableOpacity onPress={() => handleLike(item.id)}>
+          <Text style={styles.likeButton}>❤️ Like</Text>
+        </TouchableOpacity>
+        <Text style={styles.likeCount}>{item.likes} likes</Text>
+      </View>
+
+      <Text style={styles.caption}>
+        <Text style={styles.userText}>{item.user} </Text>
+        {item.caption}
+      </Text>
+    </View>
+  );
+
+  useEffect(() => {
+    const getFeed = async () => {
+      try {
+        const response = await fetch("http://10.13.16.52:3001/api/posts/feed", {
+          headers: {
+            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3MzI4MjBiZDFjMDRiYjJhMTAyZjYzNyIsImlhdCI6MTczMTM2MzQxNiwiZXhwIjoxNzMzOTU1NDE2fQ.qX6q94MieuxsMe2kyjVJQIgshhEJLFnuslav4m1b_H8`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        const data = await response.json();
+        console.log("Feed fetched:", data);
+        // setUsers(data);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      } finally {
+        // setLoading(false);
       }
-    >
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Home</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit{" "}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText>{" "}
-          to see changes. Press{" "}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: "cmd + d", android: "cmd + m" })}
-          </ThemedText>{" "}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this
-          starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{" "}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText>{" "}
-          to get a fresh <ThemedText type="defaultSemiBold">app</ThemedText>{" "}
-          directory. This will move the current{" "}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{" "}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    };
+
+    getFeed();
+  }, []);
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <FlatList
+        data={posts}
+        renderItem={renderPost}
+        keyExtractor={(item) => item.id}
+        style={styles.feed}
+      />
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  feed: {
+    backgroundColor: "#fff",
+  },
+  postContainer: {
+    marginBottom: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+    paddingBottom: 10,
+  },
+  userText: {
+    fontWeight: "bold",
+    padding: 10,
+  },
+  image: {
+    width: "100%",
+    height: 300,
+  },
+  actionsContainer: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    padding: 10,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  likeButton: {
+    fontSize: 16,
+    color: "#ff3333",
+    marginRight: 10,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: "absolute",
+  likeCount: {
+    fontSize: 16,
+  },
+  caption: {
+    paddingHorizontal: 10,
+    fontSize: 14,
   },
 });
