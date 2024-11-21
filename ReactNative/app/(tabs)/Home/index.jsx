@@ -9,20 +9,28 @@ import {
 import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import getToken from "../../../utils/tokenHandler";
+import formatDate from "../../../utils/timeHelper";
+import Icon from "react-native-vector-icons/FontAwesome";
+import * as Animatable from "react-native-animatable";
 
 export default function HomeScreen() {
   const BACKEND = process.env.EXPO_PUBLIC_BACKEND;
 
   const [posts, setPosts] = useState();
   const [isLoading, setIsLoading] = useState(true);
+  const [isLiked, setIsLiked] = useState(false);
 
-  // Function to handle like button press
-  const handleLike = (id) => {
-    setPosts((prevPosts) =>
-      prevPosts.map((post) =>
-        post.id === id ? { ...post, likes: post.likes + 1 } : post
-      )
-    );
+  const heartAnimationRef = React.useRef(null);
+
+  // TODO: Implement like functionality
+  const handleLike = () => {
+    if (!isLiked) {
+      heartAnimationRef.current.bounceIn();
+      // setLikes((prev) => prev + 1);
+    } else {
+      // setLikes((prev) => prev - 1);
+    }
+    setIsLiked(!isLiked);
   };
 
   const renderPost = ({ item }) => {
@@ -38,26 +46,25 @@ export default function HomeScreen() {
           style={styles.image}
         />
 
-        <View key={"actions-" + item._id} style={styles.actionsContainer}>
-          <TouchableOpacity
-            key={"like-" + item._id}
-            onPress={() => handleLike(item.id)}
-          >
-            <Text key={"likeButton-" + item._id} style={styles.likeButton}>
-              ❤️ Like
-            </Text>
+        <View style={styles.likeRow}>
+          <TouchableOpacity onPress={handleLike}>
+            <Animatable.View ref={heartAnimationRef}>
+              <Icon
+                name={isLiked ? "heart" : "heart-o"}
+                size={28}
+                color={isLiked ? "#FF0000" : "#000"}
+              />
+            </Animatable.View>
           </TouchableOpacity>
-          <Text key={"likesAmount-" + item._id} style={styles.likeCount}>
-            {item.likes} likes
+          <Text style={styles.postLikes}>
+          {item.likes.length}
           </Text>
         </View>
 
-        <Text key={"captionText-" + item._id} style={styles.caption}>
-          <Text key={"captionUsername-" + item._id} style={styles.userText}>
-            {item.user.username}{" "}
-          </Text>
-          <Text key={"caption-" + item._id}>{item.caption}</Text>
-        </Text>
+        <View style={styles.captionLikesRow}>
+          <Text style={styles.postCaption}>{item.caption}</Text>
+          <Text style={styles.postDate}>{formatDate(item.createdAt)}</Text>
+        </View>
       </View>
     );
   };
@@ -103,6 +110,7 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: "#fff",
+    padding: 5,
   },
   feed: {
     backgroundColor: "#fff",
@@ -131,11 +139,55 @@ const styles = StyleSheet.create({
     color: "#ff3333",
     marginRight: 10,
   },
+  likeRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 10,
+  },
   likeCount: {
     fontSize: 16,
   },
   caption: {
     paddingHorizontal: 10,
     fontSize: 14,
+  },
+  captionLikesRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 10,
+  },
+  postCaption: {
+    fontSize: 16,
+    fontWeight: "bold",
+    flex: 1,
+    marginRight: 10,
+  },
+  postLikes: {
+    fontSize: 20,
+    color: "gray",
+    marginLeft: 10,
+  },
+  likeButton: {
+    marginTop: 10,
+    alignSelf: "flex-start",
+    backgroundColor: "#007BFF",
+    paddingVertical: 5,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+  },
+  likeButtonText: {
+    fontSize: 14,
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  liked: {
+    backgroundColor: "#FF0000",
+    color: "#fff",
+  },
+  postDate: {
+    fontSize: 12,
+    color: "gray",
+    marginTop: 5,
   },
 });

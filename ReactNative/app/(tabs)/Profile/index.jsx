@@ -8,6 +8,7 @@ import {
   SafeAreaView,
 } from "react-native";
 import getToken from "../../../utils/tokenHandler";
+import formatDate from "../../../utils/timeHelper";
 
 const ProfileScreen = () => {
   const BACKEND = process.env.EXPO_PUBLIC_BACKEND;
@@ -21,6 +22,7 @@ const ProfileScreen = () => {
 
       try {
         const response = await fetch(
+          // TODO: Replace userId with actual userId
           BACKEND + "/api/user/profile/67351f7204c12f7542f2e9cd",
           {
             headers: {
@@ -40,21 +42,11 @@ const ProfileScreen = () => {
     fetchProfileData();
   }, []);
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-  };
-
-  // Render a single post item
   const renderPost = ({ item }) => (
     <View style={styles.postContainer}>
       <Image
         source={{
-          uri: BACKEND + "/" + item.imageUrl, // Make sure to use the full URL
+          uri: BACKEND + "/" + item.imageUrl,
         }}
         style={styles.postImage}
       />
@@ -75,13 +67,12 @@ const ProfileScreen = () => {
       <View style={styles.container}>
         {profile ? (
           <>
-            {/* Profile Header */}
             <View style={styles.profileHeader}>
               <Image
                 source={{
                   uri: profile.profilePicture
-                    ? BACKEND + "/" + profile.profilePicture // Full URL for profile picture
-                    : "https://via.placeholder.com/100", // Placeholder if no profile picture
+                    ? BACKEND + "/" + profile.profilePicture
+                    : "https://via.placeholder.com/100",
                 }}
                 style={styles.profilePicture}
               />
@@ -91,7 +82,6 @@ const ProfileScreen = () => {
               </Text>
             </View>
 
-            {/* Posts */}
             <FlatList
               data={posts}
               renderItem={renderPost}
@@ -149,16 +139,16 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   captionLikesRow: {
-    flexDirection: "row", // Align caption and likes in a row
-    justifyContent: "space-between", // Space between caption and likes
-    alignItems: "center", // Center align items vertically
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginTop: 10,
   },
   postCaption: {
     fontSize: 16,
     fontWeight: "bold",
-    flex: 1, // Let caption take available space
-    marginRight: 10, // Add spacing between caption and likes
+    flex: 1,
+    marginRight: 10,
   },
   postLikes: {
     fontSize: 14,
