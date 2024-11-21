@@ -8,39 +8,13 @@ import {
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-const samplePosts = [
-  {
-    id: "1",
-    user: "johndoe",
-    imageUrl:
-      "https://cdn.pixabay.com/photo/2024/01/17/12/06/car-8514314_640.png",
-    caption: "Look at this cute kitten!",
-    likes: 100,
-  },
-  {
-    id: "2",
-    user: "janedoe",
-    imageUrl:
-      "https://cdn.pixabay.com/photo/2024/01/17/12/06/car-8514314_640.png",
-    caption: "Another adorable cat!",
-    likes: 250,
-  },
-  {
-    id: "3",
-    user: "janedoe2",
-    imageUrl:
-      "https://cdn.pixabay.com/photo/2024/01/17/12/06/car-8514314_640.png",
-    caption: "Another adorable cat!",
-    likes: 252,
-  },
-  // Add more posts here
-];
+import getToken from "../../../utils/tokenHandler";
 
 export default function HomeScreen() {
   const BACKEND = process.env.EXPO_PUBLIC_BACKEND;
 
-  const [posts, setPosts] = useState(samplePosts);
+  const [posts, setPosts] = useState();
+  const [isLoading, setIsLoading] = useState(true);
 
   // Function to handle like button press
   const handleLike = (id) => {
@@ -51,55 +25,74 @@ export default function HomeScreen() {
     );
   };
 
-  const renderPost = ({ item }) => (
-    <View style={styles.postContainer}>
-      <Text style={styles.userText}>{item.user}</Text>
+  const renderPost = ({ item }) => {
+    return (
+      <View key={"MainView-" + item._id} style={styles.postContainer}>
+        <Text key={"Username-" + item._id} style={styles.userText}>
+          {item.user.username}
+        </Text>
 
-      <Image source={{ uri: item.imageUrl }} style={styles.image} />
+        <Image
+          key={"image-" + item._id}
+          source={{ uri: BACKEND + "/" + item.imageUrl }}
+          style={styles.image}
+        />
 
-      <View style={styles.actionsContainer}>
-        <TouchableOpacity onPress={() => handleLike(item.id)}>
-          <Text style={styles.likeButton}>❤️ Like</Text>
-        </TouchableOpacity>
-        <Text style={styles.likeCount}>{item.likes} likes</Text>
+        <View key={"actions-" + item._id} style={styles.actionsContainer}>
+          <TouchableOpacity
+            key={"like-" + item._id}
+            onPress={() => handleLike(item.id)}
+          >
+            <Text key={"likeButton-" + item._id} style={styles.likeButton}>
+              ❤️ Like
+            </Text>
+          </TouchableOpacity>
+          <Text key={"likesAmount-" + item._id} style={styles.likeCount}>
+            {item.likes} likes
+          </Text>
+        </View>
+
+        <Text key={"captionText-" + item._id} style={styles.caption}>
+          <Text key={"captionUsername-" + item._id} style={styles.userText}>
+            {item.user.username}{" "}
+          </Text>
+          <Text key={"caption-" + item._id}>{item.caption}</Text>
+        </Text>
       </View>
-
-      <Text style={styles.caption}>
-        <Text style={styles.userText}>{item.user} </Text>
-        {item.caption}
-      </Text>
-    </View>
-  );
+    );
+  };
 
   useEffect(() => {
     const getFeed = async () => {
+      const TOKEN = await getToken();
+
       try {
         const response = await fetch(BACKEND + "/api/posts/feed", {
           headers: {
-            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3MzI4MjBiZDFjMDRiYjJhMTAyZjYzNyIsImlhdCI6MTczMTM2MzQxNiwiZXhwIjoxNzMzOTU1NDE2fQ.qX6q94MieuxsMe2kyjVJQIgshhEJLFnuslav4m1b_H8`,
+            Authorization: "Bearer " + TOKEN,
             "Content-Type": "application/json",
           },
         });
 
         const data = await response.json();
-        console.log("Feed fetched:", data);
-        // setUsers(data);
+
+        setPosts(data);
       } catch (error) {
-        console.error("Error fetching users:", error);
+        console.error("Error fetching posts:", error);
       } finally {
-        // setLoading(false);
+        setIsLoading(false);
       }
     };
 
     getFeed();
-  }, []);
+  }, [isLoading]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <FlatList
         data={posts}
         renderItem={renderPost}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item._id}
         style={styles.feed}
       />
     </SafeAreaView>

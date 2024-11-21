@@ -1,11 +1,14 @@
 import React, { useEffect } from "react";
-import { Redirect, useNavigation } from "expo-router";
+import { useNavigation } from "expo-router";
 import { useState } from "react";
 import { View, Text, TextInput, Button, TouchableOpacity } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import validateToken from "../utils/tokenHandler";
 
 const LoginPage = () => {
   const navigation = useNavigation();
+
+  const BACKEND = process.env.EXPO_PUBLIC_BACKEND;
 
   const redirectRegister = () => {
     navigation.navigate("Home");
@@ -17,23 +20,13 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const getToken = async () => {
-      try {
-        const value = await AsyncStorage.getItem("authToken");
-        if (value) {
-          navigation.replace("(tabs)");
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    getToken();
+    validateToken();
   }, []);
 
   const handleLogin = async () => {
     try {
       setLoading(true);
-      const response = await fetch("http://172.20.10.2:3001/api/auth/login", {
+      const response = await fetch(BACKEND + "/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -93,24 +86,5 @@ const LoginPage = () => {
   );
 };
 
-const index = () => {
-  const navigation = useNavigation();
-
-  useEffect(() => {
-    const getToken = async () => {
-      try {
-        const value = await AsyncStorage.getItem("authToken");
-        console.log(value);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    getToken();
-  }, []);
-
-  return <LoginPage />;
-};
 export default LoginPage;
 
-// obtener token, guardarlo en local storage y mandar al usurio a home

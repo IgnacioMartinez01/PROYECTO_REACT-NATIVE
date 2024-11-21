@@ -11,21 +11,25 @@ import {
 } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import { useNavigation } from "@react-navigation/native";
 import { router } from "expo-router";
+import getToken from "../../../utils/tokenHandler";
 
 export default function HomeScreen() {
+  const BACKEND = process.env.EXPO_PUBLIC_BACKEND;
+
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const getAllUsers = async () => {
+      const TOKEN = await getToken();
+
       try {
-        const response = await fetch("http://172.20.10.2:3001/api/user/all", {
+        const response = await fetch(BACKEND + "/api/user/all", {
           headers: {
-            Authorization:
-              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3MjAwYTZmNDU2YjA2Y2U3ZWE0NjFiNiIsImlhdCI6MTczMDE1MzIzMywiZXhwIjoxNzMyNzQ1MjMzfQ.w31t6R5D_6EG_PHOxYvsXfn0lQ9Xcsu0pTP-5vpbvk0",
+            Authorization: "Bearer " + TOKEN,
+            "Content-Type": "application/json",
           },
         });
         const data = await response.json();
