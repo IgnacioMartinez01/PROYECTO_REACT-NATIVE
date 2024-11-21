@@ -38,6 +38,8 @@ const samplePosts = [
 ];
 
 export default function HomeScreen() {
+  const BACKEND = process.env.EXPO_PUBLIC_BACKEND;
+
   const [posts, setPosts] = useState(samplePosts);
 
   // Function to handle like button press
@@ -72,7 +74,7 @@ export default function HomeScreen() {
   useEffect(() => {
     const getFeed = async () => {
       try {
-        const response = await fetch("http://10.13.16.52:3001/api/posts/feed", {
+        const response = await fetch(BACKEND + "/api/posts/feed", {
           headers: {
             Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3MzI4MjBiZDFjMDRiYjJhMTAyZjYzNyIsImlhdCI6MTczMTM2MzQxNiwiZXhwIjoxNzMzOTU1NDE2fQ.qX6q94MieuxsMe2kyjVJQIgshhEJLFnuslav4m1b_H8`,
             "Content-Type": "application/json",
