@@ -26,20 +26,17 @@ export default function HomeScreen() {
 
   // TODO: Implement like functionality
   const handleLike = async (post) => {
-    console.log(post);
     const TOKEN = await getToken();
     
     if (!post.likes.includes(userId)) {
       heartAnimationRef.current.bounceIn();
       try {
-        const response = await fetch(BACKEND + "/api/posts/" + post._id + "/like", {
+        await fetch(BACKEND + "/api/posts/" + post._id + "/like", {
           method: "POST",
           headers: {
             Authorization: "Bearer " + TOKEN,
           },
         });
-
-        console.log(response);
       
         setIsLoading(true)
         getFeed();
