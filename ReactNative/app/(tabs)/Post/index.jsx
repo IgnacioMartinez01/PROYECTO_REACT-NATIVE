@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Button, Image, View, Text, TextInput, StyleSheet, SafeAreaView, FlatList } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { Card } from '@rneui/themed';
+import getToken from "../../../utils/tokenHandler";
 
 export default function ImageGallery() {
 
@@ -63,7 +64,7 @@ export default function ImageGallery() {
         const response = await fetch(BACKEND + `/api/posts/upload`, {
           method: "POST",
           headers: {
-            Authorization: `Bearer` + TOKEN,
+            Authorization: `Bearer ` + TOKEN,
           },
           body: formData,
         });
