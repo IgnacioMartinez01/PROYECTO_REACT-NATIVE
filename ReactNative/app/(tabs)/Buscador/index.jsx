@@ -11,11 +11,13 @@ import {
 } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import { router } from "expo-router";
+import { router, useNavigation } from "expo-router";
 import getToken from "../../../utils/tokenHandler";
 
 export default function HomeScreen() {
   const BACKEND = process.env.EXPO_PUBLIC_BACKEND;
+
+  const navigation = useNavigation();
 
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -49,7 +51,12 @@ export default function HomeScreen() {
   );
 
   const handleUserPress = (userId) => {
-    router.navigate("Profile", { userId }); // Navigate to Profile screen with userId
+    router.push({
+      pathname: "/Buscador/ViewProfile", // Navigate to the relative route
+      params: { userId: userId }, // Pass query parameters as an object
+    });
+    // navigation.push(`/Buscador/ViewProfile?userId=${userId}`)
+    // router.navigate(`/ViewProfile?userId=${userId}`); // Navigate to Profile screen with userId
   };
 
   return (
