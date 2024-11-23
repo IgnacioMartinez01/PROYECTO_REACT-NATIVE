@@ -1,56 +1,73 @@
-import { Image, StyleSheet, Platform } from "react-native";
-
+import React, { useEffect, useState } from "react";
+import {
+  StyleSheet,
+  FlatList,
+  Text,
+  View,
+  ActivityIndicator,
+  Platform,
+} from "react-native";
 import { HelloWave } from "@/components/HelloWave";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import React from "react";
 
-export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }}
-      headerImage={
-        <Image
-          source={require("@/assets/images/partial-react-logo.png")}
-          style={styles.reactLogo}
-        />
+export default function Notifications() {
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      const TOKEN = await getToken(); // Obtén el token desde tu lógica
+
+      try {
+        const response = await fetch(BACKEND + "/api/notifications", {
+          headers: {
+            Authorization: "Bearer " + TOKEN,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Error fetching notifications");
+        }
+
+        const data = await response.json();
+        setNotifications(data); // Guarda las notificaciones en el estado
+      } catch (error) {
+        console.error("Error fetching notifications:", error);
+      } finally {
+        setLoading(false); // Detiene la animación de carga
       }
-    >
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Notifications</ThemedText>
-        <HelloWave />
-      </ThemedView>
+    };
+
+    fetchNotifications();
+  }, []);
+
+  if (loading) {
+    return <ActivityIndicator size="large" style={styles.loading} />;
+  }
+
+  return (
+    <ParallaxScrollView>
       <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit{" "}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText>{" "}
-          to see changes. Press{" "}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: "cmd + d", android: "cmd + m" })}
-          </ThemedText>{" "}
-          to open developer tools.
+        <ThemedText style={styles.titleContainer}>
+          <ThemedText variant="h1">Notifications</ThemedText>
         </ThemedText>
       </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this
-          starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{" "}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText>{" "}
-          to get a fresh <ThemedText type="defaultSemiBold">app</ThemedText>{" "}
-          directory. This will move the current{" "}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{" "}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
+      <FlatList
+        data={notifications}
+        keyExtractor={(item) => item._id}
+        renderItem={({ item }) => (
+          <View style={styles.notificationItem}>
+            <Text style={styles.notificationText}>
+              {item.type === "follow"
+                ? `${item.fromUserId.username} started following you.`
+                : `${item.fromUserId.username} liked your post.`}
+            </Text>
+          </View>
+        )}
+      />
     </ParallaxScrollView>
   );
 }
@@ -65,11 +82,17 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 8,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: "absolute",
+  loading: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  notificationItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+  },
+  notificationText: {
+    fontSize: 16,
   },
 });
