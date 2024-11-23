@@ -11,17 +11,21 @@ import { HelloWave } from "@/components/HelloWave";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
+import getToken from "../../../utils/tokenHandler";
 
 export default function Notifications() {
+  const BACKEND = process.env.EXPO_PUBLIC_BACKEND;
+
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchNotifications = async () => {
-      const TOKEN = await getToken(); // Obtén el token desde tu lógica
+      const TOKEN = await getToken();
+      
 
       try {
-        const response = await fetch(BACKEND + "/api/notifications", {
+        const response = await fetch(BACKEND + "/api/user/notifications", {
           headers: {
             Authorization: "Bearer " + TOKEN,
             "Content-Type": "application/json",
