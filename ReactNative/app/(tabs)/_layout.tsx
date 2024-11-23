@@ -28,15 +28,19 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="Buscador/index"
+        name="Buscador"
         options={{
-          title: "Search",
+          title: "Buscador",
+          tabBarLabel: "Buscador",
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
-              name={focused ? "search" : "search-outline"}
+              name={focused ? "person" : "person-outline"}
               color={color}
             />
           ),
+        }}
+        initialParams={{
+          userId: undefined,
         }}
       />
       <Tabs.Screen
@@ -66,15 +70,19 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="Profile/index"
+        name="Profile"
         options={{
           title: "My Profile",
+          tabBarLabel: "My Profile",
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
               name={focused ? "person" : "person-outline"}
               color={color}
             />
           ),
+        }}
+        initialParams={{
+          userId: undefined,
         }}
       />
     </Tabs>
