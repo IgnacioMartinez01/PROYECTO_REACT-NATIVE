@@ -12,25 +12,41 @@ import getToken from "../../../utils/tokenHandler";
 import formatDate from "../../../utils/timeHelper";
 import Icon from "react-native-vector-icons/FontAwesome";
 import * as Animatable from "react-native-animatable";
+import { useFocusEffect } from "expo-router";
+import { jwtDecode } from "jwt-decode";
 
 export default function HomeScreen() {
   const BACKEND = process.env.EXPO_PUBLIC_BACKEND;
 
+  const [userId, setUserId] = useState();
   const [posts, setPosts] = useState();
   const [isLoading, setIsLoading] = useState(true);
-  const [isLiked, setIsLiked] = useState(false);
 
   const heartAnimationRef = React.useRef(null);
 
   // TODO: Implement like functionality
-  const handleLike = () => {
-    if (!isLiked) {
+  const handleLike = async (post) => {
+    console.log(post);
+    const TOKEN = await getToken();
+    
+    if (!post.likes.includes(userId)) {
       heartAnimationRef.current.bounceIn();
-      // setLikes((prev) => prev + 1);
-    } else {
-      // setLikes((prev) => prev - 1);
+      try {
+        const response = await fetch(BACKEND + "/api/posts/" + post._id + "/like", {
+          method: "POST",
+          headers: {
+            Authorization: "Bearer " + TOKEN,
+          },
+        });
+
+        console.log(response);
+      
+        setIsLoading(true)
+        getFeed();
+      } catch (error) {
+        console.error("Error fetching posts:", error);
+      }
     }
-    setIsLiked(!isLiked);
   };
 
   const renderPost = ({ item }) => {
@@ -47,12 +63,12 @@ export default function HomeScreen() {
         />
 
         <View style={styles.likeRow}>
-          <TouchableOpacity onPress={handleLike}>
+          <TouchableOpacity onPress={() => handleLike(item)}>
             <Animatable.View ref={heartAnimationRef}>
               <Icon
-                name={isLiked ? "heart" : "heart-o"}
+                name={item.likes.includes(userId) ? "heart" : "heart-o"}
                 size={28}
-                color={isLiked ? "#FF0000" : "#000"}
+                color={item.likes.includes(userId) ? "#FF0000" : "#000"}
               />
             </Animatable.View>
           </TouchableOpacity>
@@ -69,30 +85,38 @@ export default function HomeScreen() {
     );
   };
 
+  const getFeed = async () => {
+    const TOKEN = await getToken();
+    const decoded = await jwtDecode(TOKEN);
+    setUserId(decoded?.id);
+
+    try {
+      const response = await fetch(BACKEND + "/api/posts/feed", {
+        headers: {
+          Authorization: "Bearer " + TOKEN,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await response.json();
+
+      setPosts(data);
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const getFeed = async () => {
-      const TOKEN = await getToken();
-
-      try {
-        const response = await fetch(BACKEND + "/api/posts/feed", {
-          headers: {
-            Authorization: "Bearer " + TOKEN,
-            "Content-Type": "application/json",
-          },
-        });
-
-        const data = await response.json();
-
-        setPosts(data);
-      } catch (error) {
-        console.error("Error fetching posts:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     getFeed();
   }, [isLoading]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      getFeed();
+    }, [])
+  );
 
   return (
     <SafeAreaView style={styles.safeArea}>
