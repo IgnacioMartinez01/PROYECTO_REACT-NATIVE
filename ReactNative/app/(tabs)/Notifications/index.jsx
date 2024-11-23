@@ -52,7 +52,8 @@ export default function Notifications() {
     <ParallaxScrollView>
       <ThemedView style={styles.stepContainer}>
         <ThemedText style={styles.titleContainer}>
-          <ThemedText variant="h1">Notifications</ThemedText>
+          <ThemedText variant="h1">Notifications</ThemedText>{" "}
+          {/* Cambia el tamaño del texto */}
         </ThemedText>
       </ThemedView>
       <FlatList
