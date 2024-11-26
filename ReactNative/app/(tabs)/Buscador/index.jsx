@@ -13,6 +13,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { router, useNavigation } from "expo-router";
 import getToken from "../../../utils/tokenHandler";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
   const BACKEND = process.env.EXPO_PUBLIC_BACKEND;
@@ -60,93 +61,108 @@ export default function HomeScreen() {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <ThemedView style={styles.titleContainer}>
-          <ThemedText style={styles.titleText} type="title">
-            Buscador
-          </ThemedText>
-        </ThemedView>
-      </View>
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.header}>
+          <View style={styles.titleContainer}>
+            <Text style={styles.titleText}>Buscador</Text>
+          </View>
+        </View>
 
-      <TextInput
-        style={styles.searchInput}
-        placeholder="Buscar por nombre"
-        placeholderTextColor="#888"
-        value={searchTerm}
-        onChangeText={setSearchTerm}
-      />
-
-      {loading ? (
-        <ActivityIndicator
-          size="large"
-          color="#0000ff"
-          style={styles.loading}
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Buscar por nombre"
+          placeholderTextColor="#888"
+          value={searchTerm}
+          onChangeText={setSearchTerm}
         />
-      ) : (
-        filteredUsers.map((user) => (
-          <TouchableOpacity
-            key={user._id}
-            onPress={() => handleUserPress(user._id)}
-          >
-            <View style={styles.userContainer}>
-              <Image
-                source={{
-                  uri: user.profilePicture || "https://via.placeholder.com/50",
-                }}
-                style={styles.profileImage}
-              />
-              <View style={styles.userInfo}>
-                <Text style={styles.userName}>{user.username}</Text>
-                <Text style={styles.userEmail}>{user.email}</Text>
+
+        {loading ? (
+          <ActivityIndicator
+            size="large"
+            color="#0000ff"
+            style={styles.loading}
+          />
+        ) : filteredUsers.length === 0 ? (
+          <Text style={styles.noResultsText}>No hay resultados</Text>
+        ) : (
+          filteredUsers.map((user) => (
+            <TouchableOpacity
+              key={user._id}
+              onPress={() => handleUserPress(user._id)}
+            >
+              <View style={styles.userContainer}>
+                <Image
+                  source={{
+                    uri:
+                      user.profilePicture || "https://via.placeholder.com/50",
+                  }}
+                  style={styles.profileImage}
+                />
+                <View style={styles.userInfo}>
+                  <Text style={styles.userName}>{user.username}</Text>
+                  <Text style={styles.userEmail}>{user.email}</Text>
+                </View>
               </View>
-            </View>
-          </TouchableOpacity>
-        ))
-      )}
-    </ScrollView>
+            </TouchableOpacity>
+          ))
+        )}
+      </ScrollView>
+    </SafeAreaView>
   );
 }
-
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  container: {
+    flexGrow: 1,
+    padding: 16,
+  },
+  header: {
+    marginBottom: 16,
+  },
+  titleContainer: {
+    alignItems: "center",
+    marginBottom: 8,
+  },
   titleText: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "black",
-  },
-  container: {
-    flex: 1,
-    backgroundColor: "#f9f9f9",
-  },
-  header: {
-    alignItems: "center",
-    backgroundColor: "white",
-    paddingVertical: 20,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    marginBottom: 10,
-  },
-  titleContainer: {
-    backgroundColor: "white",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
   },
   searchInput: {
-    padding: 8,
-    margin: 10,
-    borderColor: "#ccc",
     borderWidth: 1,
+    borderColor: "#ccc",
     borderRadius: 8,
-    color: "#000",
-    backgroundColor: "#fff",
+    padding: 10,
+    marginBottom: 16,
+  },
+  loading: {
+    marginTop: 20,
+  },
+  noResultsText: {
+    textAlign: "center",
+    fontSize: 16,
+    color: "#888",
   },
   userContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
     padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
+    borderWidth: 1,
+    borderColor: "#eee",
+    borderRadius: 8,
+  },
+  profileImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 10,
+  },
+  userInfo: {
+    flex: 1,
   },
   userName: {
     fontSize: 16,
@@ -154,10 +170,6 @@ const styles = StyleSheet.create({
   },
   userEmail: {
     fontSize: 14,
-    color: "#555",
-  },
-  loading: {
-    marginTop: 20,
-    alignSelf: "center",
+    color: "#666",
   },
 });
