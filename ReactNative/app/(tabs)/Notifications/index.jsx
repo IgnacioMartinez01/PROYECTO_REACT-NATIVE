@@ -65,36 +65,41 @@ export default function Notifications() {
 
   return (
     <View style={styles.container}>
-      {/* Header estilo Instagram */}
       <View style={styles.header}>
         <Text style={styles.headerText}>Notifications</Text>
       </View>
 
-      {/* Lista de notificaciones */}
-      <FlatList
-        data={notifications}
-        keyExtractor={(item) => item._id}
-        renderItem={({ item }) => (
-          <View style={styles.notificationItem}>
-            {/* Imagen del usuario */}
-            <Image
-              source={{
-                uri:
-                  item.fromUserId.profilePicture ||
-                  "https://via.placeholder.com/50",
-              }}
-              style={styles.userAvatar}
-            />
-            {/* Texto de la notificación */}
-            <Text style={styles.notificationText}>
-              {item.type === "follow"
-                ? `${item.fromUserId.username} started following you.`
-                : `${item.fromUserId.username} liked your post.`}
-            </Text>
-          </View>
-        )}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
-      />
+      {/* Verificar si no hay notificaciones */}
+      {notifications.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>No tienes notificaciones aún</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={notifications}
+          keyExtractor={(item) => item._id}
+          renderItem={({ item }) => (
+            <View style={styles.notificationItem}>
+              {/* Imagen del usuario */}
+              <Image
+                source={{
+                  uri:
+                    item.fromUserId.profilePicture ||
+                    "https://via.placeholder.com/50",
+                }}
+                style={styles.userAvatar}
+              />
+              {/* Texto de la notificación */}
+              <Text style={styles.notificationText}>
+                {item.type === "follow"
+                  ? `${item.fromUserId.username} started following you.`
+                  : `${item.fromUserId.username} liked your post.`}
+              </Text>
+            </View>
+          )}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
+        />
+      )}
     </View>
   );
 }
@@ -146,6 +151,16 @@ const styles = StyleSheet.create({
   errorText: {
     color: "red",
     fontSize: 16,
+    textAlign: "center",
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  emptyText: {
+    fontSize: 16,
+    color: "#999",
     textAlign: "center",
   },
 });
