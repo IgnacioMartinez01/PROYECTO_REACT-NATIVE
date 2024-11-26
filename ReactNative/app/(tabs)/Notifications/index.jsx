@@ -8,6 +8,7 @@ import {
   Image,
 } from "react-native";
 import getToken from "../../../utils/tokenHandler";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Notifications() {
   const BACKEND = process.env.EXPO_PUBLIC_BACKEND;
@@ -64,6 +65,7 @@ export default function Notifications() {
   }
 
   return (
+    <SafeAreaView style={styles.safeArea}>
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerText}>Notifications</Text>
@@ -101,10 +103,15 @@ export default function Notifications() {
         />
       )}
     </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
   container: {
     flex: 1,
     backgroundColor: "#fff",
