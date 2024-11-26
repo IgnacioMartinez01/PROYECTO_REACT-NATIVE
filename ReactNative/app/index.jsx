@@ -120,7 +120,7 @@ const RegisterPage = () => {
       const data = await response.json();
 
       if (response.ok) {
-        navigation.navigate("(tabs)");
+        alert("¡Registrado exitosamente!");
       } else {
         setError(data.message || "Error al registrar");
       }
