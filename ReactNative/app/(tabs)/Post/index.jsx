@@ -2,8 +2,11 @@ import React, { useState, useEffect } from "react";
 import { Button, Image, View, Text, TextInput, StyleSheet, SafeAreaView, FlatList } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { Card } from '@rneui/themed';
+import getToken from "../../../utils/tokenHandler";
 
 export default function ImageGallery() {
+
+  const BACKEND = process.env.EXPO_PUBLIC_BACKEND;
   const [description, setDescription] = useState("");
   const [image, setImage] = useState("");
   const [posts, setPosts] = useState([]);
@@ -42,20 +45,49 @@ export default function ImageGallery() {
     }
   };
 
-  const publishPost = () => {
+  const publishPost = async () => {
+
+    console.log("Imagen:", image);
+    console.log("Descripción:", description);
+
+    const TOKEN = await getToken();
     if (image && description) {
-      const newPost = {
-        id: Date.now().toString(),
-        image,
-        description,
-      };
-      setPosts([newPost, ...posts]);
-      setImage("");
-      setDescription("");
+      const formData = new FormData();
+      formData.append("image", {
+        uri: image,
+        type: "image/jpeg", 
+        name: `photo_${Date.now()}.jpg`,
+      });
+      formData.append("caption", description);
+  
+      try {
+        const response = await fetch(BACKEND + `/api/posts/upload`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ` + TOKEN,
+          },
+          body: formData,
+        });
+  
+        if (response.ok) {
+          const newPost = await response.json();
+          setPosts([newPost, ...posts]);
+          setImage("");
+          setDescription("");
+          alert("¡Publicación exitosa!");
+        } else {
+          const error = await response.json();
+          alert(`Error: ${error.message}`);
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Error al publicar. Por favor, intenta nuevamente.");
+      }
     } else {
       alert("Por favor, selecciona una imagen y agrega una descripción.");
     }
   };
+  
 
   const renderPost = ({ item }) => (
     <View style={styles.postContainer}>

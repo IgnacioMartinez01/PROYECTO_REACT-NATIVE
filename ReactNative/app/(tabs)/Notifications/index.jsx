@@ -5,12 +5,8 @@ import {
   Text,
   View,
   ActivityIndicator,
-  Platform,
+  Image,
 } from "react-native";
-import { HelloWave } from "@/components/HelloWave";
-import ParallaxScrollView from "@/components/ParallaxScrollView";
-import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
 import getToken from "../../../utils/tokenHandler";
 
 export default function Notifications() {
@@ -18,11 +14,11 @@ export default function Notifications() {
 
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchNotifications = async () => {
       const TOKEN = await getToken();
-      
 
       try {
         const response = await fetch(BACKEND + "/api/user/notifications", {
@@ -37,11 +33,18 @@ export default function Notifications() {
         }
 
         const data = await response.json();
-        setNotifications(data); // Guarda las notificaciones en el estado
+
+        // Ordenar notificaciones por fecha (descendente)
+        const sortedNotifications = [...data].sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+
+        setNotifications(sortedNotifications);
       } catch (error) {
         console.error("Error fetching notifications:", error);
+        setError("Could not load notifications. Please try again later.");
       } finally {
-        setLoading(false); // Detiene la animación de carga
+        setLoading(false);
       }
     };
 
@@ -52,19 +55,37 @@ export default function Notifications() {
     return <ActivityIndicator size="large" style={styles.loading} />;
   }
 
+  if (error) {
+    return (
+      <View style={styles.loading}>
+        <Text style={styles.errorText}>{error}</Text>
+      </View>
+    );
+  }
+
   return (
-    <ParallaxScrollView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText style={styles.titleContainer}>
-          <ThemedText variant="h1">Notifications</ThemedText>{" "}
-          {/* Cambia el tamaño del texto */}
-        </ThemedText>
-      </ThemedView>
+    <View style={styles.container}>
+      {/* Header estilo Instagram */}
+      <View style={styles.header}>
+        <Text style={styles.headerText}>Notifications</Text>
+      </View>
+
+      {/* Lista de notificaciones */}
       <FlatList
         data={notifications}
         keyExtractor={(item) => item._id}
         renderItem={({ item }) => (
           <View style={styles.notificationItem}>
+            {/* Imagen del usuario */}
+            <Image
+              source={{
+                uri:
+                  item.fromUserId.profilePicture ||
+                  "https://via.placeholder.com/50",
+              }}
+              style={styles.userAvatar}
+            />
+            {/* Texto de la notificación */}
             <Text style={styles.notificationText}>
               {item.type === "follow"
                 ? `${item.fromUserId.username} started following you.`
@@ -72,20 +93,29 @@ export default function Notifications() {
             </Text>
           </View>
         )}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
-    </ParallaxScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  header: {
+    height: 60,
+    backgroundColor: "#fff",
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  headerText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#000",
   },
   loading: {
     flex: 1,
@@ -93,11 +123,29 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   notificationItem: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 15,
+  },
+  userAvatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 15,
   },
   notificationText: {
     fontSize: 16,
+    color: "#333",
+    flex: 1,
+  },
+  separator: {
+    height: 1,
+    backgroundColor: "#eee",
+    marginHorizontal: 15,
+  },
+  errorText: {
+    color: "red",
+    fontSize: 16,
+    textAlign: "center",
   },
 });
