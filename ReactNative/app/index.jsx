@@ -35,9 +35,6 @@ const LoginPage = () => {
     validateToken();
   }, []);
 
-  console.log(getToken());
-  
-
   const handleLogin = async () => {
     try {
       setLoading(true);
