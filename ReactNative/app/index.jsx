@@ -10,9 +10,8 @@ import {
   ActivityIndicator,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import validateToken from "../utils/tokenHandler";
-import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
+import getToken from "../utils/tokenHandler";
 
 const LoginPage = () => {
   const navigation = useNavigation();
@@ -24,9 +23,20 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [register, setRegister] = useState(false);
 
+  const validateToken = async ()=>{
+    const TOKEN = await getToken()
+
+    if(TOKEN[0] == "e") {
+      navigation.replace("(tabs)");
+    }
+  }
+
   useEffect(() => {
     validateToken();
   }, []);
+
+  console.log(getToken());
+  
 
   const handleLogin = async () => {
     try {
