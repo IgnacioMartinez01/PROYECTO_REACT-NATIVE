@@ -65,12 +65,12 @@ const LoginPage = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <Text style={styles.title}>Fakestagram</Text>
+      <Text style={styles.title}>Fakestagram</Text>
         {register ? (
           <RegisterPage />
         ) : (
           <>
-            <View>
+            <View style= {{width:"100%", alignItems: "center"}}>
               <TextInput
                 placeholder="Email"
                 value={email}
@@ -78,6 +78,7 @@ const LoginPage = () => {
                 keyboardType="email-address"
                 autoCapitalize="none"
                 style={styles.input}
+                placeholderTextColor={"#888"}
               />
               <TextInput
                 placeholder="Password"
@@ -85,11 +86,15 @@ const LoginPage = () => {
                 onChangeText={setPassword}
                 secureTextEntry
                 style={styles.input}
+                placeholderTextColor={"#888"}
               />
               {loading ? (
                 <ActivityIndicator size="large" color="#007BFF" />
               ) : (
-                <Button title="Login" onPress={handleLogin} />
+                <TouchableOpacity onPress={handleLogin} style={styles.button}>
+                  <Text style={styles.buttonText}>Login</Text>
+                </TouchableOpacity>
+
               )}
             </View>
             {!!error && <Text style={styles.error}>{error}</Text>}
@@ -147,12 +152,14 @@ const RegisterPage = () => {
           keyboardType="email-address"
           autoCapitalize="none"
           style={styles.input}
+          placeholderTextColor={"#888"}
         />
         <TextInput
           placeholder="Username"
           value={username}
           onChangeText={setUsername}
           style={styles.input}
+          placeholderTextColor={"#888"}
         />
         <TextInput
           placeholder="Password"
@@ -160,11 +167,14 @@ const RegisterPage = () => {
           onChangeText={setPassword}
           secureTextEntry
           style={styles.input}
+          placeholderTextColor={"#888"}
         />
         {loading ? (
           <ActivityIndicator size="large" color="#007BFF" />
         ) : (
-          <Button title="Register" onPress={handleRegister} />
+          <TouchableOpacity onPress={handleRegister} style={styles.button}>
+              <Text style={styles.buttonText}>Register</Text>
+          </TouchableOpacity>
         )}
       {!!error && <Text style={styles.error}>{error}</Text>}
     </>
@@ -178,33 +188,54 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
-    justifyContent: "flex-start",
-    marginTop: 50,
   },
   title: {
-    fontSize: 32,
+    fontSize: 36,
     fontWeight: "bold",
     textAlign: "center",
-    marginBottom: 30,
+    marginBottom: 40,
+    textTransform: "uppercase",
+    color: "#BD61DE",
+    fontFamily: "Moul", "SansSerif": "Moul",
   },
   input: {
     borderWidth: 1,
     borderColor: "#CCC",
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 15,
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 20,
+    width: "90%",
+    fontSize: 16,
+    backgroundColor: "#f5f5f5", 
+  },
+  button: {
+    width: "90%",
+    padding: 15,
+    backgroundColor: "#BD61DE",
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 20,
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  link: {
+    color: "gray",
+    textAlign: "center",
+    marginTop: 20,
+    fontSize: 16,
+    fontWeight: "600",
   },
   error: {
     color: "red",
     marginTop: 10,
     textAlign: "center",
-  },
-  link: {
-    color: "#007BFF",
-    textAlign: "center",
-    marginTop: 20,
-    fontSize: 16,
   },
 });
 
